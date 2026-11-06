@@ -1,3 +1,6 @@
+import authRoutes from './routes/auth.routes.js';
+import customerRoutes from './routes/customers.routes.js';
+import feeRoutes from './routes/fees.routes.js'; // Added for Phase 2
 import express from "express";
 import cors from "cors";
 import coreRoutes from "./routes/core.routes.js";
@@ -21,6 +24,7 @@ app.get("/api", (_req, res) =>
     endpoints: [
       "/api/products", "/api/darkstores", "/api/darkstores/nearest", "/api/catalog",
       "/api/orders", "/api/orders/quote", "/api/payments",
+      "/api/auth", "/api/customers", "/api/fees", "/api/inventory", "/api/replenishments",
       "/version", "/info", "/health"
     ]
   })
@@ -37,10 +41,11 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/payments", paymentRoutes);
 
 // Team modules are mounted here
-// app.use("/api/auth", authRoutes);            // Joseph  – SCRUM-12/13
-// app.use("/api/fees", feeRoutes);             // Joseph  – SCRUM-29
-app.use("/api/inventory", inventoryRoutes);
-app.use("/api/replenishments", replenishmentRoutes);
+app.use("/api/auth", authRoutes);                 // Joseph  – SCRUM-38
+app.use("/api/customers", customerRoutes);        // Joseph  – SCRUM-38
+app.use("/api/fees", feeRoutes);                  // Joseph  – SCRUM-39
+app.use("/api/inventory", inventoryRoutes);       // Russine – SCRUM-40
+app.use("/api/replenishments", replenishmentRoutes); // Russine – SCRUM-40
 // app.use("/api/picker", pickerRoutes);        // Russine – SCRUM-22/23/24
 // app.use("/api/riders", riderRoutes);         // Dhruvi  – SCRUM-25
 // app.use("/api/deliveries", deliveryRoutes);  // Dhruvi  – SCRUM-25/26/27/28

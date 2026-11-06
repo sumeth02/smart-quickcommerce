@@ -1,7 +1,25 @@
+import { useState } from "react";
+import AuthModal from "./AuthModal.jsx";
+import { getCurrentCustomer, logout } from "../api.js";
+
 export default function Header({
   location, locations, onLocationChange, store, search, onSearch,
   cartCount, cartTotal, onOpenCart, onOpenOrders
 }) {
+  const [user, setUser] = useState(getCurrentCustomer);
+  const [showAuth, setShowAuth] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+    setUser(null);
+    window.location.reload(); // switch back to the guest cart and orders
+  };
+
+  const handleLogin = (customer) => {
+    setUser(customer);
+    window.location.reload(); // load this customer's orders
+  };
+
   const useMyLocation = () => {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition((pos) =>
@@ -45,11 +63,18 @@ export default function Header({
       />
 
       <div className="header-actions">
+        {user ? (
+          <button className="ghost" onClick={handleLogout} title="Log out">👤 {user.name} · Log out</button>
+        ) : (
+          <button className="ghost" onClick={() => setShowAuth(true)}>Log in</button>
+        )}
         <button className="ghost" onClick={onOpenOrders}>My orders</button>
         <button className="cart-btn" onClick={onOpenCart}>
           🛒 {cartCount > 0 ? `${cartCount} · €${cartTotal.toFixed(2)}` : "Cart"}
         </button>
       </div>
+
+      {showAuth && <AuthModal onClose={() => setShowAuth(false)} onLoginSuccess={handleLogin} />}
     </header>
   );
 }

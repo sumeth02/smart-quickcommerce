@@ -1,8 +1,3 @@
-// In-memory database shared by every module.
-// Each collection is a plain array; resetDb() restores the seed (used by tests).
-// Team modules (auth, inventory alerts, picker, riders, deliveries, fees) add
-// their own collections here.
-
 import { seedDarkStores, seedProducts, seedInventory } from "./seed.js";
 
 export const db = {
@@ -11,6 +6,8 @@ export const db = {
   inventory: [],
   orders: [],
   payments: [],
+  customers: [],
+  feeRules: [],
   inventoryAlerts: [],
   replenishments: []
 };
@@ -21,12 +18,14 @@ export function resetDb() {
   db.inventory = seedInventory();
   db.orders = [];
   db.payments = [];
+  db.customers = [];
+  db.feeRules = [];
   db.inventoryAlerts = [];
   db.replenishments = [];
 }
 
 export function nextId(collection) {
+  if (!collection || collection.length === 0) return 1;
   return collection.reduce((max, item) => Math.max(max, item.id), 0) + 1;
 }
-
 resetDb();
