@@ -60,7 +60,7 @@ export function calculateDeliveryFee({ subtotal, darkStoreId }) {
     
     multiplier = getDemandMultiplier(darkStoreId);
     if (multiplier > 1) {
-      deliveryFee *= multiplier;
+      deliveryFee = Math.round(deliveryFee * multiplier * 100) / 100;
       reason = 'high-demand';
     }
   }

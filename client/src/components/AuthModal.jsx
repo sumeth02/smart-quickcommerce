@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import api from '../api';
+import { api } from '../api.js';
 
 export default function AuthModal({ onClose, onLoginSuccess }) {
   const [isLogin, setIsLogin] = useState(true);
@@ -24,8 +24,8 @@ export default function AuthModal({ onClose, onLoginSuccess }) {
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-tabs">
           <button onClick={() => setIsLogin(true)} className={isLogin ? 'active' : ''}>Login</button>
           <button onClick={() => setIsLogin(false)} className={!isLogin ? 'active' : ''}>Register</button>
