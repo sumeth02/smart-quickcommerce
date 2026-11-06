@@ -6,6 +6,8 @@ import darkStoreRoutes from "./routes/darkStores.routes.js";
 import catalogRoutes from "./routes/catalog.routes.js";
 import orderRoutes from "./routes/orders.routes.js";
 import paymentRoutes from "./routes/payments.routes.js";
+import inventoryRoutes from "./routes/inventory.routes.js";
+import replenishmentRoutes from "./routes/replenishment.routes.js";
 import { errorHandler, notFoundHandler } from "./utils/errorHandler.js";
 
 const app = express();
@@ -37,7 +39,8 @@ app.use("/api/payments", paymentRoutes);
 // Team modules are mounted here
 // app.use("/api/auth", authRoutes);            // Joseph  – SCRUM-12/13
 // app.use("/api/fees", feeRoutes);             // Joseph  – SCRUM-29
-// app.use("/api/inventory", inventoryRoutes);  // Russine – SCRUM-19/21/30
+app.use("/api/inventory", inventoryRoutes);
+app.use("/api/replenishments", replenishmentRoutes);
 // app.use("/api/picker", pickerRoutes);        // Russine – SCRUM-22/23/24
 // app.use("/api/riders", riderRoutes);         // Dhruvi  – SCRUM-25
 // app.use("/api/deliveries", deliveryRoutes);  // Dhruvi  – SCRUM-25/26/27/28
