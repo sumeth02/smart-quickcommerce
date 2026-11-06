@@ -6,8 +6,10 @@ export const db = {
   inventory: [],
   orders: [],
   payments: [],
-  customers: [], // Added for auth
-  feeRules: []   // Added for dynamic fees
+  customers: [],
+  feeRules: [],
+  inventoryAlerts: [],
+  replenishments: []
 };
 
 export function resetDb() {
@@ -18,9 +20,12 @@ export function resetDb() {
   db.payments = [];
   db.customers = [];
   db.feeRules = [];
+  db.inventoryAlerts = [];
+  db.replenishments = [];
 }
 
 export function nextId(collection) {
   if (!collection || collection.length === 0) return 1;
   return collection.reduce((max, item) => Math.max(max, item.id), 0) + 1;
 }
+resetDb();
