@@ -58,9 +58,8 @@ src/
   utils/       geo, httpError, errorHandler, status, appInfo
 test/          integration tests + unit/
 client/        React customer app
-docs/          TEAM_TASKS.md (team assignments and prompts)
 ```
 
 ## Team & workflow
 
-See [docs/TEAM_TASKS.md](docs/TEAM_TASKS.md). Branch `feature/SCRUM-<id>-<name>` → commit `feat(SCRUM-<id>): …` → PR `SCRUM-<id> | …` → merge when CI is green.
+Branch `feature/SCRUM-<id>-<name>` → commit `feat(SCRUM-<id>): …` → PR `SCRUM-<id> | …` → merge when CI is green.

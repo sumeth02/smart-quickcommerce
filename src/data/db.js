@@ -1,7 +1,7 @@
 // In-memory database shared by every module.
 // Each collection is a plain array; resetDb() restores the seed (used by tests).
 // Team modules (auth, inventory alerts, picker, riders, deliveries, fees) add
-// their own collections here — see docs/TEAM_TASKS.md.
+// their own collections here.
 
 import { seedDarkStores, seedProducts, seedInventory } from "./seed.js";
 

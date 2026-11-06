@@ -34,7 +34,7 @@ app.use("/api/catalog", catalogRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/payments", paymentRoutes);
 
-// Team modules are mounted here — see docs/TEAM_TASKS.md
+// Team modules are mounted here
 // app.use("/api/auth", authRoutes);            // Joseph  – SCRUM-12/13
 // app.use("/api/fees", feeRoutes);             // Joseph  – SCRUM-29
 // app.use("/api/inventory", inventoryRoutes);  // Russine – SCRUM-19/21/30
