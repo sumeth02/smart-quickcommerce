@@ -11,6 +11,8 @@ import orderRoutes from "./routes/orders.routes.js";
 import paymentRoutes from "./routes/payments.routes.js";
 import inventoryRoutes from "./routes/inventory.routes.js";
 import replenishmentRoutes from "./routes/replenishment.routes.js";
+import pickerRoutes from "./routes/picker.routes.js";
+import pickerStaffRoutes from "./routes/pickers.routes.js";
 import { errorHandler, notFoundHandler } from "./utils/errorHandler.js";
 
 const app = express();
@@ -46,7 +48,8 @@ app.use("/api/customers", customerRoutes);        // Joseph  – SCRUM-38
 app.use("/api/fees", feeRoutes);                  // Joseph  – SCRUM-39
 app.use("/api/inventory", inventoryRoutes);       // Russine – SCRUM-40
 app.use("/api/replenishments", replenishmentRoutes); // Russine – SCRUM-40
-// app.use("/api/picker", pickerRoutes);        // Russine – SCRUM-22/23/24
+app.use("/api/picker", pickerRoutes);
+app.use("/api/pickers", pickerStaffRoutes);       // Russine – SCRUM-22/23/24
 // app.use("/api/riders", riderRoutes);         // Dhruvi  – SCRUM-25
 // app.use("/api/deliveries", deliveryRoutes);  // Dhruvi  – SCRUM-25/26/27/28
 

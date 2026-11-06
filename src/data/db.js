@@ -9,11 +9,18 @@ export const db = {
   customers: [],
   feeRules: [],
   inventoryAlerts: [],
-  replenishments: []
+  replenishments: [],
+  pickers: [],
+  pickTasks: []
 };
 
 export function resetDb() {
   db.darkStores = seedDarkStores();
+  let pickerId = 1;
+  db.pickers = db.darkStores.flatMap((store) =>
+    [1, 2].map((n) => ({ id: pickerId++, name: `Picker ${n} (${store.name})`, darkStoreId: store.id, active: true }))
+  );
+  db.pickTasks = [];
   db.products = seedProducts();
   db.inventory = seedInventory();
   db.orders = [];
