@@ -1,3 +1,6 @@
+import authRoutes from './routes/auth.routes.js';
+import customerRoutes from './routes/customers.routes.js';
+import feeRoutes from './routes/fees.routes.js'; // Added for Phase 2
 import express from "express";
 import cors from "cors";
 import coreRoutes from "./routes/core.routes.js";
@@ -19,6 +22,7 @@ app.get("/api", (_req, res) =>
     endpoints: [
       "/api/products", "/api/darkstores", "/api/darkstores/nearest", "/api/catalog",
       "/api/orders", "/api/orders/quote", "/api/payments",
+      "/api/auth", "/api/customers", "/api/fees", // Added the new route endpoints here
       "/version", "/info", "/health"
     ]
   })
@@ -35,8 +39,9 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/payments", paymentRoutes);
 
 // Team modules are mounted here
-// app.use("/api/auth", authRoutes);            // Joseph  – SCRUM-12/13
-// app.use("/api/fees", feeRoutes);             // Joseph  – SCRUM-29
+app.use('/api/auth', authRoutes);
+app.use('/api/customers', customerRoutes);
+app.use('/api/fees', feeRoutes); // Mounted Phase 2 dynamic fees route here
 // app.use("/api/inventory", inventoryRoutes);  // Russine – SCRUM-19/21/30
 // app.use("/api/picker", pickerRoutes);        // Russine – SCRUM-22/23/24
 // app.use("/api/riders", riderRoutes);         // Dhruvi  – SCRUM-25

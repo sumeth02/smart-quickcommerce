@@ -1,55 +1,48 @@
-export default function Header({
-  location, locations, onLocationChange, store, search, onSearch,
-  cartCount, cartTotal, onOpenCart, onOpenOrders
-}) {
-  const useMyLocation = () => {
-    if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition((pos) =>
-      onLocationChange({ label: "Current location", lat: pos.coords.latitude, lng: pos.coords.longitude })
-    );
+import { useState, useEffect } from 'react';
+import AuthModal from './AuthModal';
+import './Header.css'; // Assuming you have a CSS file
+
+export default function Header() {
+  const [showAuth, setShowAuth] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('customer');
+    if (storedUser) setUser(JSON.parse(storedUser));
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('customer');
+    setUser(null);
   };
 
   return (
-    <header className="header">
-      <div className="brand">
-        <span className="logo">QB</span>
-        <div>
-          <strong>QuickBasket</strong>
-          <small>{store ? `⚡ ~10 min · ${store.name.replace("Dark Store - ", "")}` : "Finding your store…"}</small>
-        </div>
+    <header className="app-header">
+      <div className="logo">
+        <h1>Smart QuickCommerce</h1>
       </div>
-
-      <label className="location">
-        <span>Deliver to</span>
-        <select
-          value={location.label}
-          onChange={(e) => {
-            if (e.target.value === "__gps") return useMyLocation();
-            onLocationChange(locations.find((l) => l.label === e.target.value));
-          }}
-        >
-          {locations.map((l) => (
-            <option key={l.label} value={l.label}>{l.label}</option>
-          ))}
-          {location.label === "Current location" && <option value="Current location">Current location</option>}
-          <option value="__gps">📍 Use my location</option>
-        </select>
-      </label>
-
-      <input
-        className="search"
-        type="search"
-        placeholder="Search milk, bread, eggs…"
-        value={search}
-        onChange={(e) => onSearch(e.target.value)}
-      />
-
+      
       <div className="header-actions">
-        <button className="ghost" onClick={onOpenOrders}>My orders</button>
-        <button className="cart-btn" onClick={onOpenCart}>
-          🛒 {cartCount > 0 ? `${cartCount} · €${cartTotal.toFixed(2)}` : "Cart"}
-        </button>
+        {user ? (
+          <div className="user-menu">
+            <span>Welcome, {user.name}</span>
+            <button onClick={handleLogout} className="logout-btn">Log out</button>
+          </div>
+        ) : (
+          <button onClick={() => setShowAuth(true)} className="login-btn">Log in</button>
+        )}
+        
+        {/* Placeholder for cart icon/button */}
+        <button className="cart-btn">Cart</button>
       </div>
+
+      {showAuth && (
+        <AuthModal 
+          onClose={() => setShowAuth(false)} 
+          onLoginSuccess={setUser} 
+        />
+      )}
     </header>
   );
 }
