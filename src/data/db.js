@@ -10,7 +10,9 @@ export const db = {
   products: [],
   inventory: [],
   orders: [],
-  payments: []
+  payments: [],
+  inventoryAlerts: [],
+  replenishments: []
 };
 
 export function resetDb() {
@@ -19,6 +21,8 @@ export function resetDb() {
   db.inventory = seedInventory();
   db.orders = [];
   db.payments = [];
+  db.inventoryAlerts = [];
+  db.replenishments = [];
 }
 
 export function nextId(collection) {
