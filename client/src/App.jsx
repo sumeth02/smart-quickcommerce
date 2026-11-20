@@ -4,6 +4,8 @@ import Header from "./components/Header.jsx";
 import ProductGrid from "./components/ProductGrid.jsx";
 import CartPanel from "./components/CartPanel.jsx";
 import OrderTracking from "./components/OrderTracking.jsx";
+import ViewTabs from "./components/ViewTabs.jsx";
+import PickerPage from "./pages/PickerPage.jsx";
 
 export const LOCATIONS = [
   { label: "La Défense", lat: 48.8925, lng: 2.2365 },
@@ -21,6 +23,7 @@ export default function App() {
   const [cart, setCart] = useState({}); // productId -> quantity
   const [cartOpen, setCartOpen] = useState(false);
   const [trackingId, setTrackingId] = useState(null);
+  const [view, setView] = useState("shop");
 
   const loadCatalog = () => {
     setCatalogError("");
@@ -66,6 +69,15 @@ export default function App() {
     loadCatalog(); // stock changed
   };
 
+  if (view === "picker") {
+    return (
+      <div className="app">
+        <ViewTabs view={view} onChange={setView} />
+        <PickerPage />
+      </div>
+    );
+  }
+  
   return (
     <div className="app">
       <Header
@@ -80,7 +92,7 @@ export default function App() {
         onOpenCart={() => setCartOpen(true)}
         onOpenOrders={() => setTrackingId("list")}
       />
-
+      <ViewTabs view={view} onChange={setView} />
       <main className="main">
         {catalogError ? (
           <div className="empty-state">

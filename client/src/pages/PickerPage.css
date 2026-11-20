@@ -1,0 +1,114 @@
+.view-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px 0;
+}
+
+.picker-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.picker-hint {
+  color: #6b7280;
+  margin: 4px 0 12px;
+}
+
+.picker-controls {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.picker-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.9rem;
+}
+
+.picker-controls select {
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+}
+
+.picker-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.picker-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.picker-timer {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: #15803d;
+}
+
+.picker-timer.over {
+  color: #b91c1c;
+}
+
+.picker-progress {
+  height: 10px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 12px;
+}
+
+.picker-progress-bar {
+  height: 100%;
+  background: #16a34a;
+  transition: width 0.2s ease;
+}
+
+.picker-lines {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px;
+}
+
+.picker-lines li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.picker-pack:disabled,
+.picker-lines .chip:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.picker-error {
+  color: #b91c1c;
+}
+
+.picker-result {
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.picker-result.ok {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.picker-result.late {
+  background: #fee2e2;
+  color: #991b1b;
+}
