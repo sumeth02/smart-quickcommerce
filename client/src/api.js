@@ -25,7 +25,16 @@ export const api = {
   cancelOrder: (id) => request(`/api/orders/${id}`, { method: "DELETE" }),
   // Auth (Joseph – SCRUM-38)
   register: (data) => request("/api/auth/register", { method: "POST", body: data }).then(saveSession),
-  login: (email, password) => request("/api/auth/login", { method: "POST", body: { email, password } }).then(saveSession)
+  login: (email, password) => request("/api/auth/login", { method: "POST", body: { email, password } }).then(saveSession),
+    // Picker (Russine - SCRUM-41)
+  darkStores: () => request("/api/darkstores"),
+  pickers: (darkStoreId) => request(`/api/pickers?darkStoreId=${darkStoreId}`),
+  pickerQueue: (darkStoreId) => request(`/api/picker/queue?darkStoreId=${darkStoreId}`),
+  claimOrder: (orderId, pickerId) =>
+    request(`/api/picker/orders/${orderId}/claim`, { method: "POST", body: { pickerId } }),
+  scanItem: (orderId, productId) =>
+    request(`/api/picker/orders/${orderId}/scan`, { method: "POST", body: { productId } }),
+  packOrder: (orderId) => request(`/api/picker/orders/${orderId}/pack`, { method: "POST" })
 };
 
 function saveSession(res) {
