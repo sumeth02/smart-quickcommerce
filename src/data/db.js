@@ -1,4 +1,19 @@
-﻿import { seedDarkStores, seedProducts, seedInventory } from "./seed.js";
+﻿// In-memory database shared by every module.
+// Each collection is a plain array; resetDb() restores the seed (used by tests).
+// Team modules (auth, inventory alerts, picker, riders, deliveries, fees) add
+// their own collections here.
+
+import { seedDarkStores, seedProducts, seedInventory } from "./seed.js";
+
+export const defaultFeeConfig = {
+  baseFee: 1.99,
+  smallCartThreshold: 15,
+  smallCartFee: 1.5,
+  freeDeliveryThreshold: 30,
+  maxMultiplier: 2
+};
+
+export const feeConfig = { ...defaultFeeConfig };
 
 export const db = {
   darkStores: [],
@@ -17,6 +32,7 @@ export const db = {
 };
 
 export function resetDb() {
+  Object.assign(feeConfig, defaultFeeConfig);
   db.darkStores = seedDarkStores();
   let pickerId = 1;
   db.pickers = db.darkStores.flatMap((store) =>
