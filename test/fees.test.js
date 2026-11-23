@@ -30,6 +30,9 @@ describe('Fees API', () => {
       { id: 993, darkStoreId: 1, status: 'PACKED', createdAt: new Date().toISOString() }
     );
 
+    // No free riders at store 1, so the demand ratio is 3 orders / 1
+    db.riders.forEach((r) => { if (r.darkStoreId === 1) r.status = 'DELIVERING'; });
+
     const res = await request(app).get('/api/fees/surge/1');
     expect(res.status).toBe(200);
     expect(res.body.multiplier).toBe(1.25);

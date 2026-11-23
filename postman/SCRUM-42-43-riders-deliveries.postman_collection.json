@@ -1,0 +1,102 @@
+﻿{
+  "info": {
+    "name": "SCRUM-42 & SCRUM-43 Riders and Deliveries API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    }
+  ],
+  "item": [
+    {
+      "name": "Get All Riders",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/riders",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "riders"]
+        }
+      }
+    },
+    {
+      "name": "Create Rider",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Postman Rider\",\n  \"darkStoreId\": 1,\n  \"vehicle\": \"e-bike\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/riders",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "riders"]
+        }
+      }
+    },
+    {
+      "name": "Update Rider Status",
+      "request": {
+        "method": "PATCH",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"OFFLINE\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/riders/1/status",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "riders", "1", "status"]
+        }
+      }
+    },
+    {
+      "name": "Get All Deliveries",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/deliveries",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "deliveries"]
+        }
+      }
+    },
+    {
+      "name": "Dispatch Delivery for Order",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"orderId\": 1,\n  \"deliveryAddress\": \"10 Rue de la Paix, Paris\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/deliveries",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "deliveries"]
+        }
+      }
+    },
+    {
+      "name": "Update Delivery Status",
+      "request": {
+        "method": "PATCH",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"DELIVERED\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/deliveries/1/status",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "deliveries", "1", "status"]
+        }
+      }
+    }
+  ]
+}
