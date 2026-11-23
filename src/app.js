@@ -6,6 +6,8 @@ import darkStoreRoutes from "./routes/darkStores.routes.js";
 import catalogRoutes from "./routes/catalog.routes.js";
 import orderRoutes from "./routes/orders.routes.js";
 import paymentRoutes from "./routes/payments.routes.js";
+import authRoutes from "./routes/auth.routes.js";
+import customerRoutes from "./routes/customers.routes.js";
 import { errorHandler, notFoundHandler } from "./utils/errorHandler.js";
 
 const app = express();
@@ -19,6 +21,7 @@ app.get("/api", (_req, res) =>
     endpoints: [
       "/api/products", "/api/darkstores", "/api/darkstores/nearest", "/api/catalog",
       "/api/orders", "/api/orders/quote", "/api/payments",
+      "/api/auth", "/api/customers",
       "/version", "/info", "/health"
     ]
   })
@@ -35,12 +38,13 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/payments", paymentRoutes);
 
 // Team modules are mounted here
-// app.use("/api/auth", authRoutes);            // Joseph  – SCRUM-12/13
-// app.use("/api/fees", feeRoutes);             // Joseph  – SCRUM-29
-// app.use("/api/inventory", inventoryRoutes);  // Russine – SCRUM-19/21/30
-// app.use("/api/picker", pickerRoutes);        // Russine – SCRUM-22/23/24
-// app.use("/api/riders", riderRoutes);         // Dhruvi  – SCRUM-25
-// app.use("/api/deliveries", deliveryRoutes);  // Dhruvi  – SCRUM-25/26/27/28
+app.use("/api/auth", authRoutes);                // Joseph  – SCRUM-38
+app.use("/api/customers", customerRoutes);       // Joseph  – SCRUM-38
+// app.use("/api/fees", feeRoutes);              // Joseph  – SCRUM-29
+// app.use("/api/inventory", inventoryRoutes);   // Russine – SCRUM-19/21/30
+// app.use("/api/picker", pickerRoutes);         // Russine – SCRUM-22/23/24
+// app.use("/api/riders", riderRoutes);          // Dhruvi  – SCRUM-25
+// app.use("/api/deliveries", deliveryRoutes);   // Dhruvi  – SCRUM-25/26/27/28
 
 app.use(notFoundHandler);
 app.use(errorHandler);

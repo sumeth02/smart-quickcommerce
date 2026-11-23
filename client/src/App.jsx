@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { api, getCustomerId } from "./api.js";
+import { api, clearAuth, getCustomerId, getStoredCustomer } from "./api.js";
 import Header from "./components/Header.jsx";
 import ProductGrid from "./components/ProductGrid.jsx";
 import CartPanel from "./components/CartPanel.jsx";
 import OrderTracking from "./components/OrderTracking.jsx";
+import AuthModal from "./components/AuthModal.jsx";
 
 export const LOCATIONS = [
   { label: "La Défense", lat: 48.8925, lng: 2.2365 },
@@ -12,7 +13,9 @@ export const LOCATIONS = [
 ];
 
 export default function App() {
-  const customerId = useMemo(getCustomerId, []);
+  const [customer, setCustomer] = useState(getStoredCustomer);
+  const [authOpen, setAuthOpen] = useState(false);
+  const customerId = useMemo(getCustomerId, [customer]);
   const [location, setLocation] = useState(LOCATIONS[1]);
   const [catalog, setCatalog] = useState(null);
   const [catalogError, setCatalogError] = useState("");
@@ -66,6 +69,11 @@ export default function App() {
     loadCatalog(); // stock changed
   };
 
+  const handleLogout = () => {
+    clearAuth();
+    setCustomer(null);
+  };
+
   return (
     <div className="app">
       <Header
@@ -79,6 +87,9 @@ export default function App() {
         cartTotal={cartTotal}
         onOpenCart={() => setCartOpen(true)}
         onOpenOrders={() => setTrackingId("list")}
+        customer={customer}
+        onOpenAuth={() => setAuthOpen(true)}
+        onLogout={handleLogout}
       />
 
       <main className="main">
@@ -133,6 +144,13 @@ export default function App() {
           onSelect={setTrackingId}
           onClose={() => setTrackingId(null)}
           onCancelled={loadCatalog}
+        />
+      )}
+
+      {authOpen && (
+        <AuthModal
+          onClose={() => setAuthOpen(false)}
+          onSuccess={setCustomer}
         />
       )}
 

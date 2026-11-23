@@ -1,53 +1,81 @@
 export default function Header({
-  location, locations, onLocationChange, store, search, onSearch,
-  cartCount, cartTotal, onOpenCart, onOpenOrders
+  location,
+  locations,
+  onLocationChange,
+  store,
+  search,
+  onSearch,
+  cartCount,
+  cartTotal,
+  onOpenCart,
+  onOpenOrders,
+  customer,
+  onOpenAuth,
+  onLogout
 }) {
-  const useMyLocation = () => {
-    if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition((pos) =>
-      onLocationChange({ label: "Current location", lat: pos.coords.latitude, lng: pos.coords.longitude })
-    );
-  };
-
   return (
     <header className="header">
       <div className="brand">
-        <span className="logo">QB</span>
+        <div className="logo">⚡</div>
         <div>
-          <strong>QuickBasket</strong>
-          <small>{store ? `⚡ ~10 min · ${store.name.replace("Dark Store - ", "")}` : "Finding your store…"}</small>
+          <strong>SQGS</strong>
+          <small>{store ? `10 min · ${store.name}` : "10-min groceries"}</small>
         </div>
       </div>
 
       <label className="location">
-        <span>Deliver to</span>
+        Deliver to
         <select
+          aria-label="Delivery location"
           value={location.label}
           onChange={(e) => {
-            if (e.target.value === "__gps") return useMyLocation();
-            onLocationChange(locations.find((l) => l.label === e.target.value));
+            const next = locations.find((l) => l.label === e.target.value);
+            if (next) onLocationChange(next);
           }}
         >
-          {locations.map((l) => (
-            <option key={l.label} value={l.label}>{l.label}</option>
+          {locations.map((loc) => (
+            <option key={loc.label} value={loc.label}>
+              {loc.label}
+            </option>
           ))}
-          {location.label === "Current location" && <option value="Current location">Current location</option>}
-          <option value="__gps">📍 Use my location</option>
         </select>
       </label>
 
       <input
         className="search"
         type="search"
-        placeholder="Search milk, bread, eggs…"
+        placeholder="Search milk, bread, snacks…"
         value={search}
         onChange={(e) => onSearch(e.target.value)}
       />
 
       <div className="header-actions">
-        <button className="ghost" onClick={onOpenOrders}>My orders</button>
-        <button className="cart-btn" onClick={onOpenCart}>
-          🛒 {cartCount > 0 ? `${cartCount} · €${cartTotal.toFixed(2)}` : "Cart"}
+        {customer ? (
+          <span className="auth-user">
+            👤 {customer.name}
+            <button
+              type="button"
+              className="auth-logout"
+              onClick={onLogout}
+              title="Log out"
+            >
+              Log out
+            </button>
+          </span>
+        ) : (
+          <button type="button" className="ghost" onClick={onOpenAuth}>
+            Log in
+          </button>
+        )}
+
+        <button type="button" className="ghost" onClick={onOpenOrders}>
+          Orders
+        </button>
+
+        <button type="button" className="cart-btn" onClick={onOpenCart}>
+          {cartCount > 0
+            ? `🛒 ${cartCount} · €${cartTotal.toFixed(2)}`
+            : "🛒 Cart"}
         </button>
       </div>
     </header>
