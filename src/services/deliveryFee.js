@@ -1,67 +1,84 @@
-import { db } from '../data/db.js';
+import { db, defaultFeeConfig, feeConfig } from "../data/db.js";
 
-export const defaultFeeConfig = {
-  baseFee: 1.99,
-  smallCartThreshold: 15.00,
-  smallCartFee: 1.50,
-  freeDeliveryThreshold: 30.00,
-  maxMultiplier: 2
-};
+export { defaultFeeConfig, feeConfig };
 
-export let feeConfig = { ...defaultFeeConfig };
+const ACTIVE_ORDER_STATUSES = new Set(["PLACED", "PICKING", "PACKED"]);
+const DEMAND_WINDOW_MS = 15 * 60 * 1000;
 
-export function getDemandMultiplier(darkStoreId) {
-  const now = Date.now();
-  const fifteenMinsAgo = now - 15 * 60 * 1000;
-  
-  const activeOrders = db.orders.filter(o => 
-    o.darkStoreId === darkStoreId &&
-    ['PLACED', 'PICKING', 'PACKED'].includes(o.status) &&
-    new Date(o.createdAt).getTime() >= fifteenMinsAgo
+function isRuleActive(rule, currentHour) {
+  if (rule.startHour <= rule.endHour) {
+    return currentHour >= rule.startHour && currentHour <= rule.endHour;
+  }
+  // Overnight window (e.g., 22 to 2)
+  return currentHour >= rule.startHour || currentHour <= rule.endHour;
+}
+
+/**
+ * Computes active order count (last 15 min), available riders, and surge multiplier
+ * for a given dark store.
+ */
+export function getStoreDemand(darkStoreId, now = new Date()) {
+  const nowMs = now.getTime();
+  const windowStart = nowMs - DEMAND_WINDOW_MS;
+
+  const activeOrders = (db.orders ?? []).filter(
+    (o) =>
+      o.darkStoreId === darkStoreId &&
+      ACTIVE_ORDER_STATUSES.has(o.status) &&
+      new Date(o.createdAt).getTime() >= windowStart
   ).length;
 
-  const riders = db.riders || [];
-  const availableRiders = riders.filter(r => 
-    r.darkStoreId === darkStoreId && 
-    r.status === 'AVAILABLE'
+  const availableRiders = (db.riders ?? []).filter(
+    (r) => r.darkStoreId === darkStoreId && r.status === "AVAILABLE"
   ).length;
 
   const ratio = activeOrders / Math.max(availableRiders, 1);
-  
-  let multiplier = 1;
-  if (ratio >= 4) multiplier = 1.5;
-  else if (ratio >= 2) multiplier = 1.25;
 
-  const currentHour = new Date().getHours();
-  const activeRules = (db.feeRules || []).filter(rule => 
-    currentHour >= rule.startHour && currentHour < rule.endHour
-  );
-  
-  for (const rule of activeRules) {
-    multiplier = Math.max(multiplier, rule.multiplier);
+  let multiplier = 1;
+  if (ratio >= 4) {
+    multiplier = 1.5;
+  } else if (ratio >= 2) {
+    multiplier = 1.25;
   }
 
-  return Math.min(multiplier, feeConfig.maxMultiplier);
+  const currentHour = now.getHours();
+  for (const rule of db.feeRules ?? []) {
+    if (isRuleActive(rule, currentHour)) {
+      multiplier *= rule.multiplier;
+    }
+  }
+
+  const capped = Math.min(multiplier, feeConfig.maxMultiplier);
+  return {
+    darkStoreId,
+    activeOrders,
+    availableRiders,
+    multiplier: Math.round(capped * 100) / 100
+  };
 }
 
-export function calculateDeliveryFee({ subtotal, darkStoreId }) {
+export function getDemandMultiplier(darkStoreId, now = new Date()) {
+  return getStoreDemand(darkStoreId, now).multiplier;
+}
+
+export function calculateDeliveryFee({ subtotal, darkStoreId, now = new Date() }) {
   let deliveryFee = feeConfig.baseFee;
   let smallCartFee = 0;
-  let reason = 'standard';
+  let reason = "standard";
   let multiplier = 1;
 
   if (subtotal >= feeConfig.freeDeliveryThreshold) {
     deliveryFee = 0;
-    reason = 'free-delivery';
+    reason = "free-delivery";
   } else {
     if (subtotal < feeConfig.smallCartThreshold) {
       smallCartFee = feeConfig.smallCartFee;
     }
-    
-    multiplier = getDemandMultiplier(darkStoreId);
+
+    multiplier = getDemandMultiplier(darkStoreId, now);
     if (multiplier > 1) {
-      deliveryFee = Math.round(deliveryFee * multiplier * 100) / 100;
-      reason = 'high-demand';
+      deliveryFee = Math.round(feeConfig.baseFee * multiplier * 100) / 100;
+      reason = "high-demand";
     }
   }
 

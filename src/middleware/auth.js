@@ -1,24 +1,22 @@
-import { verifyToken } from '../services/authService.js';
-import { db } from '../data/db.js';
+import { verifyToken } from "../services/authService.js";
+import { HttpError } from "../utils/httpError.js";
 
-export function requireAuth(req, res, next) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: true, message: 'Unauthorized' });
+/**
+ * Express middleware that requires a valid "Authorization: Bearer <token>" header.
+ * Populates req.user with the decoded token payload, or throws 401.
+ */
+export function requireAuth(req, _res, next) {
+  const header = req.headers.authorization;
+  if (typeof header !== "string" || !header.startsWith("Bearer ")) {
+    throw new HttpError(401, "Authorization token required");
   }
 
-  const token = authHeader.split(' ')[1];
+  const token = header.slice("Bearer ".length).trim();
   const payload = verifyToken(token);
-
-  if (!payload || !payload.id) {
-    return res.status(401).json({ error: true, message: 'Invalid or expired token' });
+  if (!payload) {
+    throw new HttpError(401, "Invalid or expired token");
   }
 
-  const customer = db.customers.find(c => c.id === payload.id);
-  if (!customer) {
-    return res.status(401).json({ error: true, message: 'Customer not found' });
-  }
-
-  req.user = customer;
+  req.user = payload;
   next();
 }
