@@ -1,55 +1,95 @@
-import crypto from 'node:crypto';
+import crypto from "node:crypto";
 
-const SECRET = process.env.AUTH_SECRET || 'dev-secret-key';
+const DEFAULT_SECRET = "dev-sqgs-auth-secret-change-in-prod";
+const TOKEN_TTL_SECONDS = 24 * 60 * 60; // 24 hours
+const KEY_LENGTH = 64;
 
+function getSecret() {
+  return process.env.AUTH_SECRET || DEFAULT_SECRET;
+}
+
+/**
+ * Hashes a plain-text password using scrypt with a random 16-byte salt.
+ * Stored format: "<saltHex>:<derivedKeyHex>"
+ */
 export function hashPassword(password) {
-  const salt = crypto.randomBytes(16).toString('hex');
-  const derivedKey = crypto.scryptSync(password, salt, 64).toString('hex');
+  const salt = crypto.randomBytes(16).toString("hex");
+  const derivedKey = crypto.scryptSync(password, salt, KEY_LENGTH).toString("hex");
   return `${salt}:${derivedKey}`;
 }
 
-export function verifyPassword(password, hash) {
-  const [salt, key] = hash.split(':');
-  const keyBuffer = Buffer.from(key, 'hex');
-  const derivedKey = crypto.scryptSync(password, salt, 64);
-  return crypto.timingSafeEqual(keyBuffer, derivedKey);
+/**
+ * Verifies a plain-text password against a stored "<salt>:<hash>" string
+ * using timingSafeEqual to prevent timing attacks.
+ */
+export function verifyPassword(password, storedHash) {
+  if (typeof password !== "string" || typeof storedHash !== "string") return false;
+  const parts = storedHash.split(":");
+  if (parts.length !== 2) return false;
+
+  const [salt, keyHex] = parts;
+  if (!salt || !keyHex) return false;
+
+  const storedKey = Buffer.from(keyHex, "hex");
+  const derivedKey = crypto.scryptSync(password, salt, KEY_LENGTH);
+
+  if (storedKey.length !== derivedKey.length) return false;
+  return crypto.timingSafeEqual(derivedKey, storedKey);
 }
 
-function base64url(str) {
-  return Buffer.from(str).toString('base64url').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
-}
-
-export function signToken(payload) {
-  const header = base64url(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
-  const payloadStr = base64url(JSON.stringify({ ...payload, exp: Date.now() + 24 * 60 * 60 * 1000 }));
-  
+/**
+ * Signs a payload with HMAC-SHA256: "base64url(payload).signature"
+ */
+export function signToken(payload, { expiresInSeconds = TOKEN_TTL_SECONDS } = {}) {
+  const exp = Math.floor(Date.now() / 1000) + expiresInSeconds;
+  const encodedPayload = Buffer.from(JSON.stringify({ ...payload, exp })).toString("base64url");
   const signature = crypto
-    .createHmac('sha256', SECRET)
-    .update(`${header}.${payloadStr}`)
-    .digest('base64url');
-    
-  return `${header}.${payloadStr}.${signature}`;
+    .createHmac("sha256", getSecret())
+    .update(encodedPayload)
+    .digest("base64url");
+  return `${encodedPayload}.${signature}`;
 }
 
+/**
+ * Verifies an HMAC-SHA256 token's signature and expiry.
+ * Returns the decoded payload or null if invalid/expired.
+ */
 export function verifyToken(token) {
+  if (typeof token !== "string") return null;
+  const parts = token.split(".");
+  if (parts.length !== 2) return null;
+
+  const [encodedPayload, signature] = parts;
+  if (!encodedPayload || !signature) return null;
+
+  const expectedSig = crypto
+    .createHmac("sha256", getSecret())
+    .update(encodedPayload)
+    .digest("base64url");
+
+  const sigBuf = Buffer.from(signature);
+  const expectedBuf = Buffer.from(expectedSig);
+  if (sigBuf.length !== expectedBuf.length || !crypto.timingSafeEqual(sigBuf, expectedBuf)) {
+    return null;
+  }
+
   try {
-    const [header, payloadStr, signature] = token.split('.');
-    if (!header || !payloadStr || !signature) return null;
-
-    const expectedSignature = crypto
-      .createHmac('sha256', SECRET)
-      .update(`${header}.${payloadStr}`)
-      .digest('base64url');
-
-    if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
-      return null;
-    }
-
-    const payload = JSON.parse(Buffer.from(payloadStr, 'base64url').toString('utf-8'));
-    if (payload.exp < Date.now()) return null;
-    
+    const payload = JSON.parse(Buffer.from(encodedPayload, "base64url").toString("utf8"));
+    const now = Math.floor(Date.now() / 1000);
+    if (typeof payload.exp !== "number" || payload.exp <= now) return null;
     return payload;
   } catch {
     return null;
   }
+}
+
+/** Strips passwordHash before sending a customer object in API responses. */
+export function sanitizeCustomer(customer) {
+  return {
+    id: customer.id,
+    name: customer.name,
+    email: customer.email,
+    phone: customer.phone ?? null,
+    createdAt: customer.createdAt
+  };
 }
